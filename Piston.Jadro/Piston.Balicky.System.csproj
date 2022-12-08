@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UkazkoveProjekty\Piston.csproj" />
+    <ProjectReference Include="..\Piston\Piston.csproj" />
   </ItemGroup>
 
 </Project>
