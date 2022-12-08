@@ -1,0 +1,3 @@
+var x = 2^16
+var y = 2^8
+print(x/y)

@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "HtCTCn+cbMTWim0PNOEFlfrEiSDONpk1feq45/m4pY9xffIC3ior6UmnuC3J5mBThC7yZ2gmGype+LA7EECzIQ==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\janpa\\Source\\repos\\UkazkoveProjekty\\UkazkoveProjekty\\Piston.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\janpa\\.nuget\\packages\\newtonsoft.json\\13.0.2\\newtonsoft.json.13.0.2.nupkg.sha512"
+  ],
+  "logs": []
+}
