@@ -14,6 +14,8 @@ namespace Piston.kompilace
         VYRAZ,
         PODMINKA,
         ZACATEK,
+        METODA,
+        ARGUMENT,
         KONEC,
         KONEC_RADKU
     }

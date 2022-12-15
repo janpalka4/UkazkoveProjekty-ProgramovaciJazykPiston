@@ -10,6 +10,15 @@ namespace Piston.kompilace
 {
     public class SpravceTokenu
     {
+        private readonly SpravceAritmetickychVyrazu spravceAritmetickychVyrazu;
+        private readonly SpravceLogickychVyrazu spravceLogickychVyrazu;
+
+        public SpravceTokenu(SpravceAritmetickychVyrazu spravceAritmetickychVyrazu, SpravceLogickychVyrazu spravceLogickychVyrazu) 
+        {
+            this.spravceAritmetickychVyrazu = spravceAritmetickychVyrazu;
+            this.spravceLogickychVyrazu = spravceLogickychVyrazu;
+        }
+
         public List<Token> PrevedNaTokeny(string Kod)
         {
             List<Token> ret = new List<Token>();
@@ -31,12 +40,12 @@ namespace Piston.kompilace
                     ret.Add(new Token() { Typ = TypTokenu.KONEC });
                 else //Pokud nezačíná na známý keyword
                 {
-                    if (SpravceAritmetickychVyrazu.JeVyrazAritmeticky(radek) || SpravceLogickychVyrazu.JeVyrazLogicky(radek))
+                    if (SpravceAritmetickychVyrazu.JeVyrazValidni(radek) || SpravceLogickychVyrazu.JeVyrazValidni(radek))
                         ret.Add(new Token() { Typ = TypTokenu.VYRAZ, Hodnota = radek});
                     else //Jedná se o metodu
                     {
 #warning TODO: implementovat definiční scope metod (zatím se použije pouze správce balíčků)
-
+                        ret.AddRange(ZpracujVolaniMetody(_radek));
                     }
                 }
 
@@ -55,6 +64,20 @@ namespace Piston.kompilace
             ret.Add(new Token() { Typ = TypTokenu.VAR, Hodnota = "" });
             ret.Add(new Token() { Typ = TypTokenu.NAZEV, Hodnota = nazev });
             ret.Add(new Token() { Typ = TypTokenu.VYRAZ, Hodnota = strany[1] });
+
+            return ret;
+        }
+
+        private List<Token> ZpracujVolaniMetody(string radek)
+        {
+            List<Token> ret = new List<Token>();
+            string nazev = radek.Split('(')[0];
+            string[] argumenty = radek.Split('(')[1].Split(',');
+            argumenty[argumenty.Length - 1] = argumenty[argumenty.Length - 1].Substring(0, argumenty.Length - 1);
+
+            ret.Add(new Token() { Typ = TypTokenu.METODA,Hodnota= nazev });
+            foreach(string arg in argumenty)
+                ret.Add(new Token() { Typ = TypTokenu.ARGUMENT, Hodnota = arg });
 
             return ret;
         }

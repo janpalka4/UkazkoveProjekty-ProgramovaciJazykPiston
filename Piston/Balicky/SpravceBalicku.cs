@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace Piston.Balicky
 {
-    public static class SpravceBalicku
+    public class SpravceBalicku
     {
-        private static Dictionary<string, MethodInfo> RegistrMetod = new Dictionary<string, MethodInfo>();
-        public static void NactiBalicky(KonfiguraceAplikace konfigurace)
+        private Dictionary<string, MethodInfo> RegistrMetod = new Dictionary<string, MethodInfo>();
+        public void NactiBalicky(KonfiguraceAplikace konfigurace)
         {
             if (konfigurace.Balicky is not null)
                 foreach (BalicekKonfigurace balicek in konfigurace.Balicky)
@@ -27,11 +27,23 @@ namespace Piston.Balicky
 
                         foreach(MethodInfo metoda in metody)
                         {
-                            string nazev = metoda.GetCustomAttribute<Metoda>().Jmeno;
+                            string nazev = metoda.GetCustomAttribute<Metoda>()!.Jmeno;
                             RegistrMetod.Add(nazev, metoda);
                         }
                     }
                 }
+        }
+
+        public bool JeMetodaZaregistrovana(string jmeno) => RegistrMetod.ContainsKey(jmeno);
+
+        public object? VolejMetodu(string jmeno,params object[] args)
+        {
+            if (!JeMetodaZaregistrovana(jmeno))
+                throw new Exception("Metoda nebyla zaregistrovana");
+
+            MethodInfo info = RegistrMetod[jmeno];
+
+            return info.Invoke(null,parameters: args);
         }
     }
 }

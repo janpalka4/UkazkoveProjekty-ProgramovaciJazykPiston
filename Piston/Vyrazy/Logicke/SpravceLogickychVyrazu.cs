@@ -4,9 +4,16 @@ using System.Text;
 
 namespace Piston.Vyrazy.Logicke
 {
-    public static  class SpravceLogickychVyrazu
+    public class SpravceLogickychVyrazu : SpravceVyrazu
     {
-        public static LogickyVyraz VytvorVyraz(string vyraz)
+        private readonly PoskytovatelVyrazu poskytovatelVyrazu;
+
+        public SpravceLogickychVyrazu(PoskytovatelVyrazu poskytovatelVyrazu)
+        {
+            this.poskytovatelVyrazu = poskytovatelVyrazu;
+        }
+
+        public override LogickyVyraz VytvorVyraz(string vyraz)
         {
             string chybovaHlaska = ZvalidujRetezec(vyraz);
             if (chybovaHlaska != string.Empty)
@@ -89,7 +96,7 @@ namespace Piston.Vyrazy.Logicke
         /// </summary>
         /// <param name="vyraz"></param>
         /// <returns>Chybová hláška</returns>
-        private static string ZvalidujRetezec(string vyraz)
+        private string ZvalidujRetezec(string vyraz)
         {
             if (vyraz.Count(x => x == '(') > vyraz.Count(x => x == ')'))
                 return "Očekáváno ')'";
@@ -100,7 +107,7 @@ namespace Piston.Vyrazy.Logicke
             return string.Empty;
         }
 
-        private static bool ZiskejTypOperatoru(string s, out LogickyOperator.TypyOperatoru typ, out int delka)
+        private bool ZiskejTypOperatoru(string s, out LogickyOperator.TypyOperatoru typ, out int delka)
         {
             if (s != "NOT" && s != "AND")
                 s = s.Substring(0, 2);
@@ -143,16 +150,16 @@ namespace Piston.Vyrazy.Logicke
             }
         }
 
-        private static bool ZiskejTypOperatoru(string c)
+        private bool ZiskejTypOperatoru(string c)
         {
             LogickyOperator.TypyOperatoru typ;
             int d;
             return ZiskejTypOperatoru(c, out typ,out d);
         }
 
-        public static bool JeVyrazLogicky(string vyraz) => vyraz.Contains('>') || vyraz.Contains('<') || vyraz.Contains("==") || vyraz.Contains("AND") || vyraz.Contains("OR") || vyraz.Contains("NOT");
-        private static char ZiskejZnak(int index, string str) => index < str.Replace(" ","").Length && index >= 0 ? str.Replace(" ","")[index] : ' ';
-        private static IClenVyrazu RozlisVyraz(string vyraz)
+        public static bool JeVyrazValidni(string vyraz) => vyraz.Contains('>') || vyraz.Contains('<') || vyraz.Contains("==") || vyraz.Contains("AND") || vyraz.Contains("OR") || vyraz.Contains("NOT");
+        private char ZiskejZnak(int index, string str) => index < str.Replace(" ","").Length && index >= 0 ? str.Replace(" ","")[index] : ' ';
+        private IClenVyrazu RozlisVyraz(string vyraz)
         {
             string bezZavorek = vyraz.Replace("(", "").Replace(")", "");
             if (double.TryParse(bezZavorek, out double d))
@@ -160,8 +167,8 @@ namespace Piston.Vyrazy.Logicke
             if (bool.TryParse(bezZavorek, out bool b))
                 return new LogickaHodnota() { Hodnota = b};
 
-            if (SpravceAritmetickychVyrazu.JeVyrazAritmeticky(vyraz))
-                return SpravceAritmetickychVyrazu.VytvorVyraz(vyraz);
+            if (SpravceAritmetickychVyrazu.JeVyrazValidni(vyraz))
+                return poskytovatelVyrazu.ZiskejSpravce(vyraz).VytvorVyraz(vyraz);
 
             return VytvorVyraz(vyraz);
         }

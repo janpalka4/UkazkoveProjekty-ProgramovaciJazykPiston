@@ -1,4 +1,6 @@
 ﻿using Piston.Balicky;
+using Piston.Vyrazy;
+using Piston.Vyrazy.Stringove;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,5 +44,18 @@ namespace Piston.Balicky.System
 
         [Metoda("cprintln")]
         public static void cprintln(string output) => cprint(output + "\r\n");
+        
+        [Metoda("str")]
+        public static HodnotaRetezce str(IClenVyrazu expr)
+        {
+            if (expr is IClenVyrazu<bool>)
+                return new HodnotaRetezce(((IClenVyrazu<bool>)expr).Hodnota.ToString());
+            if (expr is IClenVyrazu<double>)
+                return new HodnotaRetezce(((IClenVyrazu<double>)expr).Hodnota.ToString());
+            if (expr is IClenVyrazu<string>)
+                return new HodnotaRetezce(((IClenVyrazu<string>)expr).Hodnota);
+
+            return new HodnotaRetezce(string.Empty);
+        }
     }
 }

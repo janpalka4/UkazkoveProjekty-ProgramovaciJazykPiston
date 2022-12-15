@@ -3,8 +3,13 @@ using Piston.Konfigurace;
 using Piston.Vyjimky;
 using Piston.Vyrazy.Aritmenticke;
 using Piston.Vyrazy.Logicke;
+using Piston.Vyrazy.Stringove;
+using Microsoft.Extensions.DependencyInjection;
 using System;
-
+using Microsoft.Extensions.Hosting;
+using Piston.kompilace;
+using Piston.Vstup;
+using Piston.Vyrazy;
 
 public static class Program
 {
@@ -12,57 +17,39 @@ public static class Program
     {
         ERROR,INFO,WARNING
     }
-    struct VstupInfo
-    {
-        public string[] Options;
-        public string[] Argumenty;
-    }
     public static int Main(string[] args)
     {
-        VstupInfo info = ZpracujVstup(args);
+        //Dependency Injection
+        IHost host = VytvorHostBuilder().Build();
 
+        //Načtení app.json
         KonfiguraceAplikace konfiguraceAplikace = KonfiguraceAplikace.NactiKonfiguraci()
             ?? throw new Exception("chyba při načítání konfigurace aplikace");
 
-        SpravceBalicku.NactiBalicky(konfiguraceAplikace);
+        //Načtení balíčků
+        SpravceBalicku? spravceBalicku = host.Services.GetService<SpravceBalicku>();
+        if (spravceBalicku is null)
+            throw new ChybaInicializace("Nepodařilo se načíst správce balíčků");
+        spravceBalicku!.NactiBalicky(konfiguraceAplikace);
 
         try
         {
-            if (info.Options.Length == 0 && info.Argumenty.Length == 0)
-                VyzadatVyraz();
+            SpravceVstupu? spravceVstupu = host.Services.GetService<SpravceVstupu>();
+            if (spravceVstupu is null) throw new ChybaInicializace("Nepodařilo se načíst správce vstupu");
+
+            spravceVstupu.ZpracujVstup(args);
 
             return 0;
         }
         catch(Exception ex)
         {
             VypisLog(TypyLogu.ERROR, ex.Message);
-
-            //Pokud nejsou zadány žádné argumenty pokračovat v uživatelském vstupu
-            return info.Options.Length == 0 && info.Argumenty.Length == 0 ? Main(args) : -1;
+            return -1;
         }
     }
 
-    public static string VyzadatVyraz()
-    {
-        Console.Write("Piston>> ");
 
-        string? vyraz = Console.ReadLine();
-
-        //V budoucnu spravce prikazu
-        if (vyraz == ":q")
-            return "";
-
-        if (vyraz is null)
-            return VyzadatVyraz();
-
-        if (SpravceAritmetickychVyrazu.JeVyrazAritmeticky(vyraz!))
-            Console.WriteLine(SpravceAritmetickychVyrazu.VytvorVyraz(vyraz!).Hodnota);
-        else
-            Console.WriteLine(SpravceLogickychVyrazu.VytvorVyraz(vyraz!).Hodnota);
-
-        return VyzadatVyraz();
-    }
-
+#warning TODO: vytvořit třídu logger
     private static void VypisLog(TypyLogu typ,string zprava)
     {
         ConsoleColor barva = Console.ForegroundColor;
@@ -89,22 +76,24 @@ public static class Program
         Console.Write(zprava + "\r\n");
     }
 
-    private static VstupInfo ZpracujVstup(string[] args)
+   
+    /// <summary>
+    /// Nastavení dependency injection
+    /// </summary>
+    /// <returns></returns>
+    private static IHostBuilder VytvorHostBuilder()
     {
-        string[] options = new string[0];
-        string[] argumenty = new string[0];
-
-        foreach(string arg in args)
-        {
-            if(arg.StartsWith("--"))
-                options.Append(arg);
-            else if(arg.StartsWith("-"))
-                foreach(char opt in arg.Substring(1))
-                    options.Append(opt.ToString());
-            else
-                argumenty.Append(arg);
-        }
-
-        return new VstupInfo() { Argumenty = argumenty, Options = options };
+        return Host.CreateDefaultBuilder()
+            .ConfigureServices((_, service) =>
+            {
+                service.AddSingleton<SpravceTokenu>();
+                service.AddSingleton<SpravceVstupu>();
+                service.AddSingleton<SpravceBalicku>();
+                service.AddSingleton<SpravceRetezcovychVyrazu>();
+                service.AddSingleton<SpravceLogickychVyrazu>();
+                service.AddSingleton<SpravceAritmetickychVyrazu>();
+                service.AddSingleton<PoskytovatelVyrazu>();
+                service.BuildServiceProvider();
+            });
     }
 }

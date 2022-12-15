@@ -8,9 +8,14 @@ using System.Threading.Tasks;
 
 namespace Piston.Vyrazy.Aritmenticke
 {
-    public static class SpravceAritmetickychVyrazu
+    public class SpravceAritmetickychVyrazu : SpravceVyrazu
     {
-        public static AritmetickyVyraz VytvorVyraz(string vyraz)
+
+        public SpravceAritmetickychVyrazu()
+        {
+        }
+
+        public override AritmetickyVyraz VytvorVyraz(string vyraz)
         {
             string chybovaHlaska = ZvalidujRetezec(vyraz);
             if (chybovaHlaska != string.Empty)
@@ -47,7 +52,7 @@ namespace Piston.Vyrazy.Aritmenticke
                         if (vnoreni == 0)
                         {
                             predchoziZnak = ' ';
-                            cleni.Add(VytvorVyraz(tmp.ToString()));
+                            cleni.Add((IClenVyrazu<double>)VytvorVyraz(tmp.ToString()));
                             tmp.Clear();
                         }
                         else
@@ -90,7 +95,7 @@ namespace Piston.Vyrazy.Aritmenticke
         /// </summary>
         /// <param name="vyraz"></param>
         /// <returns>Chybová hláška</returns>
-        private static string ZvalidujRetezec(string vyraz)
+        private string ZvalidujRetezec(string vyraz)
         {
             if (vyraz.Count(x => x == '(') > vyraz.Count(x => x == ')'))
                 return "Očekáváno ')'";
@@ -101,7 +106,7 @@ namespace Piston.Vyrazy.Aritmenticke
             return string.Empty;
         }
 
-        private static bool ZiskejTypOperatoru(char c, out Operator.TypyOperatoru typ)
+        private bool ZiskejTypOperatoru(char c, out Operator.TypyOperatoru typ)
         {
             int id = c;
             typ = Operator.TypyOperatoru.PLUS;
@@ -113,12 +118,12 @@ namespace Piston.Vyrazy.Aritmenticke
             }
             return false;
         }
-        private static bool ZiskejTypOperatoru(char c)
+        private bool ZiskejTypOperatoru(char c)
         {
             Operator.TypyOperatoru typ;
             return ZiskejTypOperatoru(c, out typ);
         }
 
-        public static bool JeVyrazAritmeticky(string vyraz) => (vyraz.Contains('+') || vyraz.Contains('-') || vyraz.Contains('/') || vyraz.Contains('*') || vyraz.Contains('^') || vyraz.Contains('ˇ') || vyraz.Any(x => char.IsDigit(x))) && !SpravceLogickychVyrazu.JeVyrazLogicky(vyraz);
+        public static bool JeVyrazValidni(string vyraz) => (vyraz.Contains('+') || vyraz.Contains('-') || vyraz.Contains('/') || vyraz.Contains('*') || vyraz.Contains('^') || vyraz.Contains('ˇ') || vyraz.Any(x => char.IsDigit(x)));
     }
 }
