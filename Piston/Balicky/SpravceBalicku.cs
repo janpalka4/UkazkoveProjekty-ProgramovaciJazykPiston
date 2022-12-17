@@ -36,14 +36,17 @@ namespace Piston.Balicky
 
         public bool JeMetodaZaregistrovana(string jmeno) => RegistrMetod.ContainsKey(jmeno);
 
-        public object? VolejMetodu(string jmeno,params object[] args)
+        public object? VolejMetodu(string jmeno,params object?[] args)
         {
+            List<object?> argumenty = new List<object?>();
+            argumenty.AddRange(args);
+
             if (!JeMetodaZaregistrovana(jmeno))
                 throw new Exception("Metoda nebyla zaregistrovana");
 
             MethodInfo info = RegistrMetod[jmeno];
 
-            return info.Invoke(null,parameters: args);
+            return info.Invoke(null,argumenty.ToArray());
         }
     }
 }

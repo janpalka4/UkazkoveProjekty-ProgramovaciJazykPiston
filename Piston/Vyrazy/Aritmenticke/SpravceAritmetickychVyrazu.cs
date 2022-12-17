@@ -124,6 +124,6 @@ namespace Piston.Vyrazy.Aritmenticke
             return ZiskejTypOperatoru(c, out typ);
         }
 
-        public static bool JeVyrazValidni(string vyraz) => (vyraz.Contains('+') || vyraz.Contains('-') || vyraz.Contains('/') || vyraz.Contains('*') || vyraz.Contains('^') || vyraz.Contains('ˇ') || vyraz.Any(x => char.IsDigit(x)));
+        public static bool JeVyrazValidni(string vyraz) => (vyraz.Contains('+') || vyraz.Contains('-') || vyraz.Contains('/') || vyraz.Contains('*') || vyraz.Contains('^') || vyraz.Contains('ˇ') || vyraz.Any(x => char.IsDigit(x))) && !vyraz.Contains("==") && !vyraz.Contains('"');
     }
 }

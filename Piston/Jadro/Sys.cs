@@ -13,15 +13,17 @@ namespace Piston.Balicky.System
     public class Sys
     {
         [Metoda("println")]
-        public static void println(string output) => Console.WriteLine(output);
+        public static void println(IClenVyrazu<string> output) => Console.WriteLine(output.Hodnota + "\r\n");
 
         [Metoda("print")]
-        public static void print(string output) => Console.WriteLine(output);
+        public static void print(IClenVyrazu<string> output) => Console.WriteLine(output.Hodnota);
 
         [Metoda("cprint")]
-        public static void cprint(string output)
+        public static void cprint(IClenVyrazu<string> arg)
         {
             StringBuilder tmp = new StringBuilder();
+            string output = arg.Hodnota;
+
             for(int i = 0; i < output.Length;i++)
             {
                 if (output[i] == '´' && output[i + 1] == '#')
@@ -31,7 +33,8 @@ namespace Piston.Balicky.System
                             tmp.Append(output[i]);
                         if (output[i + 1] == '´')
                         {
-                            Console.ForegroundColor = Enum.Parse<ConsoleColor>(tmp.ToString());
+                            Console.ForegroundColor = Enum.Parse<ConsoleColor>(tmp.ToString().Substring(1));
+                            i += 2;
                             tmp.Clear();
                             break;
                         }
@@ -39,11 +42,13 @@ namespace Piston.Balicky.System
                     }
 
                Console.Write(output[i]);
+                
             }
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         [Metoda("cprintln")]
-        public static void cprintln(string output) => cprint(output + "\r\n");
+        public static void cprintln(IClenVyrazu<string> output) => cprint(output);
         
         [Metoda("str")]
         public static HodnotaRetezce str(IClenVyrazu expr)

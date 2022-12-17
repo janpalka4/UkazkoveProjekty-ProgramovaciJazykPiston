@@ -1,4 +1,5 @@
-﻿using Piston.Vyrazy;
+﻿using Piston.kompilace;
+using Piston.Vyrazy;
 using Piston.Vyrazy.Aritmenticke;
 using Piston.Vyrazy.Logicke;
 using Piston.Vyrazy.Stringove;
@@ -13,10 +14,16 @@ namespace Piston.Vstup
     public class SpravceVstupu
     {
         private readonly PoskytovatelVyrazu poskytovatelVyrazu;
+        private readonly SpravceTokenu spravceTokenu;
+        private readonly SpravceSouboru spravceSouboru;
+        private readonly Kompilator kompilator;
 
-        public SpravceVstupu(PoskytovatelVyrazu poskytovatelVyrazu)
+        public SpravceVstupu(PoskytovatelVyrazu poskytovatelVyrazu,SpravceTokenu spravceTokenu, SpravceSouboru spravceSouboru, Kompilator kompilator)
         {
             this.poskytovatelVyrazu = poskytovatelVyrazu;
+            this.spravceTokenu = spravceTokenu;
+            this.spravceSouboru = spravceSouboru;
+            this.kompilator = kompilator;
         }
 
         public void ZpracujVstup(string[] args)
@@ -26,25 +33,36 @@ namespace Piston.Vstup
 
             if (info.Options.Length == 0 && info.Argumenty.Length == 0)
                 VyzadatVyraz();
+            else
+            if (info.Options.Contains("c"))
+            {
+                if (info.Argumenty.Length != 1)
+                    throw new Exception("Nesprávný počet argumentů");
+
+                UzelProgramu uzel = kompilator.KompilujProgram(info.Argumenty[0]);
+                if (info.Options.Contains("r"))
+                    uzel.VykonatUzel();
+
+            }
         }
 
         private VstupInfo ZiskejInfo(string[] args)
         {
-            string[] options = new string[0];
-            string[] argumenty = new string[0];
+            List<string> options = new List<string>();
+            List<string> argumenty = new List<string>();
 
             foreach (string arg in args)
             {
                 if (arg.StartsWith("--"))
-                    options.Append(arg);
+                    options.Add(arg);
                 else if (arg.StartsWith("-"))
                     foreach (char opt in arg.Substring(1))
-                        options.Append(opt.ToString());
+                        options.Add(opt.ToString());
                 else
-                    argumenty.Append(arg);
+                    argumenty.Add(arg);
             }
 
-            return new VstupInfo() { Argumenty = argumenty, Options = options };
+            return new VstupInfo() { Argumenty = argumenty.ToArray(), Options = options.ToArray() };
         }
 
         private string VyzadatVyraz()

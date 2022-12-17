@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Piston": {
+      "commandName": "Project",
+      "commandLineArgs": "-cr program.txt"
+    }
+  }
+}

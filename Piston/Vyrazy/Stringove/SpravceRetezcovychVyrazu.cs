@@ -36,6 +36,6 @@ namespace Piston.Vyrazy.Stringove
             return new RetezcovyVyraz(cleni);
         }
 
-        public static bool JeVyrazValidni(string vyraz) => throw new NotImplementedException();
+        public static bool JeVyrazValidni(string vyraz) => true;
     }
 }

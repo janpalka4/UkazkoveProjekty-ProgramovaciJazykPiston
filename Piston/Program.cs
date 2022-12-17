@@ -93,6 +93,8 @@ public static class Program
                 service.AddSingleton<SpravceLogickychVyrazu>();
                 service.AddSingleton<SpravceAritmetickychVyrazu>();
                 service.AddSingleton<PoskytovatelVyrazu>();
+                service.AddSingleton<SpravceSouboru>();
+                service.AddSingleton<Kompilator>();
                 service.BuildServiceProvider();
             });
     }

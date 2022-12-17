@@ -40,13 +40,13 @@ namespace Piston.kompilace
                     ret.Add(new Token() { Typ = TypTokenu.KONEC });
                 else //Pokud nezačíná na známý keyword
                 {
-                    if (SpravceAritmetickychVyrazu.JeVyrazValidni(radek) || SpravceLogickychVyrazu.JeVyrazValidni(radek))
+                    /*if (SpravceAritmetickychVyrazu.JeVyrazValidni(radek) || SpravceLogickychVyrazu.JeVyrazValidni(radek))
                         ret.Add(new Token() { Typ = TypTokenu.VYRAZ, Hodnota = radek});
                     else //Jedná se o metodu
-                    {
+                    {*/
 #warning TODO: implementovat definiční scope metod (zatím se použije pouze správce balíčků)
                         ret.AddRange(ZpracujVolaniMetody(_radek));
-                    }
+                    //}
                 }
 
                 ret.Add(new Token() { Typ = TypTokenu.KONEC_RADKU });
@@ -73,7 +73,7 @@ namespace Piston.kompilace
             List<Token> ret = new List<Token>();
             string nazev = radek.Split('(')[0];
             string[] argumenty = radek.Split('(')[1].Split(',');
-            argumenty[argumenty.Length - 1] = argumenty[argumenty.Length - 1].Substring(0, argumenty.Length - 1);
+            argumenty[argumenty.Length - 1] = argumenty[argumenty.Length - 1].Substring(0, argumenty[argumenty.Length-1].Length - 1);
 
             ret.Add(new Token() { Typ = TypTokenu.METODA,Hodnota= nazev });
             foreach(string arg in argumenty)
